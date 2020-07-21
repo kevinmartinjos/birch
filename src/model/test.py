@@ -43,7 +43,7 @@ def test(args, split='test', model=None, test_dataset=None):
         if batch is None:
             break
         tokens_tensor, segments_tensor, mask_tensor, label_tensor, qid_tensor, docid_tensor = batch
-        predictions = model(tokens_tensor, segments_tensor, mask_tensor)
+        predictions = model(input_ids=tokens_tensor, attention_mask=mask_tensor.long(), token_type_ids=segments_tensor)[0]
         scores = predictions.cpu().detach().numpy()
         predicted_index = list(torch.argmax(predictions, dim=-1).cpu().numpy())
         predicted_score = list(predictions[:, 1].cpu().detach().numpy())
@@ -84,7 +84,7 @@ def test(args, split='test', model=None, test_dataset=None):
 
     if split != 'test':
         map, p20, ndcg20 = evaluate(args.trec_eval_path, predictions_file=args.predict_path, \
-                                qrels_file=os.path.join(args.data_path, 'qrels', 'qrels.{}.txt'.format(args.collection)))
+                                qrels_file=os.path.join(args.data_path, 'qrels.{}.txt'.format(args.collection)))
         return [['map', 'p20', 'ndcg20'], [map, p20, ndcg20]]
     else:
         return None

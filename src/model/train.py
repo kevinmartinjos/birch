@@ -42,7 +42,7 @@ def train(args):
             if batch is None:
                 break
             tokens_tensor, segments_tensor, mask_tensor, label_tensor, _, _ = batch
-            loss = model(tokens_tensor, segments_tensor, mask_tensor, label_tensor)
+            loss, scores = model(input_ids=tokens_tensor, attention_mask=mask_tensor.long(), token_type_ids=segments_tensor, next_sentence_label=label_tensor)
             loss.backward()
             tr_loss += loss.item()
             optimizer.step()
